@@ -1,0 +1,14 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+.vscode/
+.idea/
+
+# Local Claude Code settings (keep project settings, ignore local overrides)
+.claude/settings.local.json
+
+# Node (only relevant if you install it later to run tests/CI locally)
+node_modules/
+npm-debug.log*

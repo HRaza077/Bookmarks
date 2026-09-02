@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="bookmark-dashboard" content="1">
+<title>Bookmark Dashboard</title>
+<style>
+  :root {
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-200: #bfdbfe;
+    --blue-500: #3b82f6;
+    --blue-600: #2563eb;
+    --blue-700: #1d4ed8;
+    --slate-50: #f8fafc;
+    --slate-100: #f1f5f9;
+    --slate-200: #e2e8f0;
+    --slate-400: #94a3b8;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --slate-900: #0f172a;
+    --surface: #ffffff;
+    --page-top: var(--blue-50);
+    --page-bottom: var(--slate-50);
+    --danger: #ef4444;
+    --radius: 14px;
+    --shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 8px 24px rgba(15, 23, 42, 0.06);
+  }
+
+  [data-theme="dark"] {
+    --blue-50: #172554;
+    --blue-100: #1e3a8a;
+    --blue-200: #1d4ed8;
+    --blue-500: #3b82f6;
+    --blue-600: #3b82f6;
+    --blue-700: #93c5fd;
+    --slate-50: #0f172a;
+    --slate-100: #334155;
+    --slate-200: #334155;
+    --slate-400: #94a3b8;
+    --slate-500: #94a3b8;
+    --slate-700: #cbd5e1;
+    --slate-900: #e2e8f0;
+    --surface: #1e293b;
+    --page-top: #0b1120;
+    --page-bottom: #0b1120;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--page-top) 0%, var(--page-bottom) 220px);
+    color: var(--slate-900);
+    min-height: 100vh;
+    line-height: 1.5;
+    transition: background .2s, color .2s;
+  }
+
+  .wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 64px;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+
+  header .brand { display: flex; align-items: center; gap: 12px; }
+
+  .theme-toggle {
+    margin-left: auto;
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--slate-200);
+    background: var(--surface);
+    color: var(--slate-700);
+    padding: 8px 14px;
+    border-radius: 999px;
+    transition: all .15s;
+  }
+  .theme-toggle:hover { border-color: var(--blue-500); color: var(--blue-700); }
+
+  header .logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--blue-500), var(--blue-700));
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  h1 { font-size: 1.55rem; font-weight: 700; letter-spacing: -0.02em; }
+  .subtitle { color: var(--slate-500); margin-bottom: 28px; font-size: 0.95rem; }
+
+  /* Form */
+  .card-panel {
+    background: var(--surface);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px;
+    margin-bottom: 28px;
+  }
+
+  .panel-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--slate-500);
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  form .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+
+  label { font-size: 0.82rem; font-weight: 600; color: var(--slate-700); }
+
+  input, textarea, select {
+    font: inherit;
+    padding: 10px 12px;
+    border: 1px solid var(--slate-200);
+    border-radius: 9px;
+    background: var(--slate-50);
+    color: var(--slate-900);
+    outline: none;
+    transition: border-color .15s, box-shadow .15s, background .15s;
+    width: 100%;
+  }
+
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--blue-500);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--blue-100);
+  }
+
+  textarea { resize: vertical; min-height: 62px; }
+
+  .btn {
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    border-radius: 9px;
+    padding: 11px 20px;
+    background: var(--blue-600);
+    color: #fff;
+    transition: background .15s, transform .05s;
+  }
+  .btn:hover { background: var(--blue-700); }
+  .btn:active { transform: translateY(1px); }
+
+  .form-actions { margin-top: 16px; display: flex; gap: 10px; }
+
+  /* Toolbar */
+  .toolbar { margin-bottom: 18px; }
+
+  .search-box { position: relative; margin-bottom: 14px; }
+  .search-box svg {
+    position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+    width: 17px; height: 17px; color: var(--slate-400);
+  }
+  .search-box input { padding-left: 38px; background: var(--surface); }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .chip {
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--slate-200);
+    background: var(--surface);
+    color: var(--slate-700);
+    padding: 7px 14px;
+    border-radius: 999px;
+    transition: all .15s;
+  }
+  .chip:hover { border-color: var(--blue-300, #93c5fd); color: var(--blue-700); }
+  .chip.active {
+    background: var(--blue-600);
+    border-color: var(--blue-600);
+    color: #fff;
+  }
+
+  /* Grid */
+  .count { color: var(--slate-500); font-size: 0.85rem; margin: 6px 2px 16px; }
+
+  .bookmarks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 16px;
+  }
+
+  .bookmark {
+    background: var(--surface);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform .12s, box-shadow .12s, border-color .12s;
+  }
+  .bookmark:hover {
+    transform: translateY(-3px);
+    border-color: var(--blue-200);
+    box-shadow: 0 6px 14px rgba(37, 99, 235, 0.12), 0 16px 40px rgba(15, 23, 42, 0.08);
+  }
+
+  .bookmark .top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+
+  .bookmark h3 { font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; }
+  .bookmark h3 a { color: var(--slate-900); text-decoration: none; }
+  .bookmark h3 a:hover { color: var(--blue-700); }
+
+  .bookmark .url {
+    font-size: 0.82rem;
+    color: var(--blue-600);
+    word-break: break-all;
+    text-decoration: none;
+  }
+  .bookmark .url:hover { text-decoration: underline; }
+
+  .bookmark .notes {
+    font-size: 0.88rem;
+    color: var(--slate-500);
+    border-top: 1px solid var(--slate-100);
+    padding-top: 10px;
+  }
+
+  .cat-tag {
+    align-self: flex-start;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--blue-700);
+    background: var(--blue-50);
+    border: 1px solid var(--blue-100);
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+
+  .del-btn {
+    flex-shrink: 0;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+    background: var(--surface);
+    color: var(--slate-400);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    transition: all .15s;
+  }
+  .del-btn:hover { background: var(--danger); border-color: var(--danger); color: #fff; }
+
+  .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+  .fav-btn, .edit-btn {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    border: 1px solid var(--slate-200);
+    background: var(--surface);
+    color: var(--slate-400);
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    transition: all .15s;
+  }
+  .fav-btn:hover { border-color: #f59e0b; color: #f59e0b; }
+  .fav-btn.on {
+    background: color-mix(in srgb, #f59e0b 14%, var(--surface));
+    border-color: #f59e0b;
+    color: #f59e0b;
+  }
+  .edit-btn:hover { border-color: var(--blue-500); color: var(--blue-600); }
+
+  .bookmark.favorite { border-color: #fcd34d; }
+  .bookmark.favorite:hover { border-color: #f59e0b; }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.55);
+    display: none;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+    z-index: 50;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--slate-200);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    padding: 24px;
+    width: 100%;
+    max-width: 460px;
+  }
+  .modal h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 18px; }
+  .modal .field { margin-bottom: 14px; }
+  .modal .form-actions { margin-top: 20px; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--slate-700);
+    border: 1px solid var(--slate-200);
+  }
+  .btn-ghost:hover { background: var(--slate-50); }
+
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--slate-400);
+  }
+  .empty .big { font-size: 42px; margin-bottom: 12px; }
+
+  /* ===== Bookmark Suggestions ===== */
+  .sugg-panel-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+  .sugg-panel-head .panel-title { margin-bottom: 0; }
+  .sugg-badge {
+    background: var(--blue-600); color: #fff; font-size: 0.72rem; font-weight: 700;
+    border-radius: 999px; padding: 2px 9px; min-width: 22px; text-align: center;
+  }
+  .sugg-bulk { margin-left: auto; display: flex; gap: 8px; }
+  .sugg-bulk .btn { padding: 7px 12px; font-size: 0.82rem; }
+
+  .sugg-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+
+  .sugg-card {
+    border: 1px solid var(--slate-200); border-radius: 12px; background: var(--surface);
+    padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  }
+  .sugg-head { display: flex; gap: 10px; align-items: flex-start; }
+  .sugg-fav {
+    width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0; object-fit: contain;
+    background: var(--slate-50); border: 1px solid var(--slate-200);
+  }
+  .sugg-fav-fb {
+    display: grid; place-items: center; font-weight: 700; color: var(--blue-700);
+    font-size: 0.9rem; background: var(--blue-50); border-color: var(--blue-100);
+  }
+  .sugg-meta { min-width: 0; flex: 1; }
+  .sugg-title {
+    font-weight: 700; font-size: 0.95rem; line-height: 1.3;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .sugg-url {
+    font-size: 0.78rem; color: var(--blue-600); text-decoration: none;
+    word-break: break-all; display: block; margin-top: 2px;
+  }
+  .sugg-url:hover { text-decoration: underline; }
+  .sugg-time { font-size: 0.76rem; color: var(--slate-500); }
+  .sugg-cat-row { display: flex; align-items: center; gap: 8px; }
+  .sugg-cat-row label { font-size: 0.76rem; color: var(--slate-500); flex-shrink: 0; }
+  .sugg-cat-row input { padding: 6px 8px; font-size: 0.82rem; }
+  .sugg-actions { display: flex; gap: 8px; }
+  .sugg-actions .btn { flex: 1; padding: 8px; font-size: 0.83rem; }
+
+  .sugg-state { text-align: center; padding: 34px 16px; color: var(--slate-500); }
+  .sugg-state .big { font-size: 34px; margin-bottom: 8px; }
+  .sugg-state .sst-title { font-weight: 700; color: var(--slate-700); margin-bottom: 4px; }
+  .sugg-state p { font-size: 0.88rem; }
+  .sugg-state .btn { margin-top: 14px; }
+
+  .sugg-paused {
+    background: color-mix(in srgb, #f59e0b 12%, var(--surface));
+    border: 1px solid #f59e0b; color: var(--slate-700);
+    border-radius: 10px; padding: 9px 12px; font-size: 0.83rem; margin-bottom: 12px;
+  }
+  .linklike {
+    background: none; border: none; color: var(--blue-600); cursor: pointer;
+    font: inherit; text-decoration: underline; padding: 0;
+  }
+
+  /* Auto-suggest settings */
+  .autosuggest-settings summary {
+    list-style: none; cursor: pointer; display: block;
+  }
+  .autosuggest-settings summary::-webkit-details-marker { display: none; }
+  .autosuggest-settings summary::before { content: "\25B8  "; }
+  .autosuggest-settings[open] summary::before { content: "\25BE  "; }
+  .as-body { margin-top: 16px; display: flex; flex-direction: column; }
+  .as-row {
+    display: flex; align-items: center; gap: 14px; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--slate-100);
+  }
+  .as-row:last-child { border-bottom: none; }
+  .as-label { font-weight: 600; font-size: 0.88rem; }
+  .as-sub { font-size: 0.78rem; color: var(--slate-500); margin-top: 2px; max-width: 46ch; }
+  .as-note { font-size: 0.85rem; color: var(--slate-500); }
+  .as-pause-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .sw { position: relative; width: 40px; height: 23px; flex-shrink: 0; display: inline-block; }
+  .sw input { opacity: 0; width: 0; height: 0; }
+  .sw span { position: absolute; inset: 0; background: var(--slate-200); border-radius: 999px; transition: .15s; cursor: pointer; }
+  .sw span::before {
+    content: ""; position: absolute; width: 17px; height: 17px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: .15s;
+  }
+  .sw input:checked + span { background: var(--blue-600); }
+  .sw input:checked + span::before { transform: translateX(17px); }
+
+  /* Toasts */
+  .toast-wrap {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    display: flex; flex-direction: column; gap: 8px; z-index: 100; align-items: center;
+    pointer-events: none;
+  }
+  .toast {
+    background: var(--slate-900); color: var(--surface);
+    padding: 10px 18px; border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s;
+    max-width: 90vw; text-align: center;
+  }
+  [data-theme="dark"] .toast { background: #e2e8f0; color: #0f172a; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast-success { background: #16a34a !important; color: #fff !important; }
+  .toast-error { background: var(--danger) !important; color: #fff !important; }
+
+  @media (max-width: 620px) {
+    .wrap { padding: 22px 14px 48px; }
+    form .grid { grid-template-columns: 1fr; }
+    h1 { font-size: 1.3rem; }
+    .bookmarks { grid-template-columns: 1fr; }
+    .form-actions { flex-direction: column; }
+    .btn { width: 100%; }
+    .sugg-list { grid-template-columns: 1fr; }
+    .sugg-bulk { margin-left: 0; width: 100%; }
+    .sugg-bulk .btn { flex: 1; }
+    .as-row { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo">🔖</div>
+      <h1>Bookmark Dashboard</h1>
+    </div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle dark mode">
+      <span id="theme-icon">🌙</span><span id="theme-label">Dark</span>
+    </button>
+  </header>
+  <p class="subtitle">Your personal collection of links, saved right in this browser.</p>
+
+  <section class="card-panel">
+    <div class="panel-title">Add a bookmark</div>
+    <form id="bookmark-form">
+      <div class="grid">
+        <div class="field">
+          <label for="f-title">Title</label>
+          <input id="f-title" type="text" placeholder="e.g. MDN Web Docs" required>
+        </div>
+        <div class="field">
+          <label for="f-url">URL</label>
+          <input id="f-url" type="url" placeholder="https://..." required>
+        </div>
+        <div class="field">
+          <label for="f-category">Category</label>
+          <input id="f-category" type="text" placeholder="e.g. Development" list="cat-list" required>
+          <datalist id="cat-list"></datalist>
+        </div>
+        <div class="field">
+          <label for="f-notes">Notes (optional)</label>
+          <input id="f-notes" type="text" placeholder="Anything worth remembering">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Save bookmark</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card-panel suggestions-panel" id="suggestions">
+    <div class="sugg-panel-head">
+      <span class="panel-title">Bookmark Suggestions</span>
+      <span class="sugg-badge" id="sugg-count" style="display:none">0</span>
+      <div class="sugg-bulk" id="sugg-bulk" style="display:none">
+        <button class="btn" id="sugg-save-all" type="button">Save All</button>
+        <button class="btn btn-ghost" id="sugg-dismiss-all" type="button">Dismiss All</button>
+      </div>
+    </div>
+    <div id="sugg-body"></div>
+  </section>
+
+  <details class="card-panel autosuggest-settings" id="autosuggest-settings">
+    <summary class="panel-title">Automatic Suggestions — settings</summary>
+    <div class="as-body" id="as-body"></div>
+  </details>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input id="search" type="search" placeholder="Search by title or category...">
+    </div>
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <div class="count" id="count"></div>
+  <div class="bookmarks" id="bookmarks"></div>
+</div>
+
+<div class="modal-overlay" id="edit-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-heading">
+    <h2 id="edit-heading">Edit bookmark</h2>
+    <form id="edit-form">
+      <div class="field">
+        <label for="e-title">Title</label>
+        <input id="e-title" type="text" required>
+      </div>
+      <div class="field">
+        <label for="e-url">URL</label>
+        <input id="e-url" type="url" required>
+      </div>
+      <div class="field">
+        <label for="e-category">Category</label>
+        <input id="e-category" type="text" list="cat-list" required>
+      </div>
+      <div class="field">
+        <label for="e-notes">Notes (optional)</label>
+        <input id="e-notes" type="text">
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn">Save changes</button>
+        <button type="button" class="btn btn-ghost" id="edit-cancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+
+<script src="extension/shared/suggest-core.js"></script>
+<script>
+  const STORAGE_KEY = "my-bookmarks-app.bookmarks";
+  const THEME_KEY = "my-bookmarks-app.theme";
+
+  const SAMPLES = [
+    { id: "s1", title: "MDN Web Docs", url: "https://developer.mozilla.org", category: "Development", notes: "Reference for HTML, CSS and JavaScript.", favorite: true },
+    { id: "s2", title: "GitHub", url: "https://github.com", category: "Development", notes: "Where all my repos live." },
+    { id: "s3", title: "Hacker News", url: "https://news.ycombinator.com", category: "News", notes: "" },
+    { id: "s4", title: "Figma", url: "https://figma.com", category: "Design", notes: "Design files and prototypes." },
+    { id: "s5", title: "Dribbble", url: "https://dribbble.com", category: "Design", notes: "UI inspiration." },
+    { id: "s6", title: "Notion", url: "https://notion.so", category: "Productivity", notes: "Notes and planning.", favorite: true },
+    { id: "s7", title: "Coursera", url: "https://coursera.org", category: "Learning", notes: "Online courses." },
+    { id: "s8", title: "Google Calendar", url: "https://calendar.google.com", category: "Productivity", notes: "" }
+  ];
+
+  let bookmarks = load();
+  let activeCategory = "All";
+  let searchTerm = "";
+
+  const $form = document.getElementById("bookmark-form");
+  const $title = document.getElementById("f-title");
+  const $url = document.getElementById("f-url");
+  const $category = document.getElementById("f-category");
+  const $notes = document.getElementById("f-notes");
+  const $search = document.getElementById("search");
+  const $filters = document.getElementById("filters");
+  const $grid = document.getElementById("bookmarks");
+  const $count = document.getElementById("count");
+  const $catList = document.getElementById("cat-list");
+  const $themeToggle = document.getElementById("theme-toggle");
+  const $themeIcon = document.getElementById("theme-icon");
+  const $themeLabel = document.getElementById("theme-label");
+  const $editOverlay = document.getElementById("edit-overlay");
+  const $editForm = document.getElementById("edit-form");
+  const $eTitle = document.getElementById("e-title");
+  const $eUrl = document.getElementById("e-url");
+  const $eCategory = document.getElementById("e-category");
+  const $eNotes = document.getElementById("e-notes");
+  let editingId = null;
+
+  /* ---- Theme ---- */
+  function applyTheme(theme) {
+    const dark = theme === "dark";
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    $themeIcon.textContent = dark ? "☀️" : "🌙";
+    $themeLabel.textContent = dark ? "Light" : "Dark";
+    try { localStorage.setItem(THEME_KEY, dark ? "dark" : "light"); } catch (e) {}
+  }
+
+  let savedTheme = "light";
+  try { savedTheme = localStorage.getItem(THEME_KEY) || "light"; } catch (e) {}
+  applyTheme(savedTheme);
+
+  $themeToggle.addEventListener("click", () => {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+    applyTheme(isDark ? "light" : "dark");
+  });
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) { /* ignore */ }
+    // First load: seed with samples
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(SAMPLES)); } catch (e) {}
+    return SAMPLES.slice();
+  }
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(bookmarks)); } catch (e) {}
+    if (window.__AutoSuggest) window.__AutoSuggest.syncIndex();
+  }
+
+  /* Canonical bookmark-creation logic — used by the add form AND by accepted suggestions. */
+  function addBookmark(data) {
+    let url = String(data && data.url || "").trim();
+    if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
+    const bm = {
+      id: "b" + Date.now() + Math.random().toString(36).slice(2, 6),
+      title: String(data && data.title || "").trim() || url,
+      url: url,
+      category: String(data && data.category || "").trim() || "Unsorted",
+      notes: String(data && data.notes || "").trim(),
+      favorite: !!(data && data.favorite)
+    };
+    bookmarks.unshift(bm);
+    save();
+    return bm;
+  }
+
+  function showToast(msg, type) {
+    const wrap = document.getElementById("toasts");
+    if (!wrap) return;
+    const t = document.createElement("div");
+    t.className = "toast" + (type ? " toast-" + type : "");
+    t.textContent = msg;
+    wrap.appendChild(t);
+    requestAnimationFrame(() => t.classList.add("show"));
+    setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 250); }, 2600);
+  }
+
+  function categories() {
+    return Array.from(new Set(bookmarks.map(b => b.category).filter(Boolean))).sort();
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function renderFilters() {
+    const cats = ["All", ...categories()];
+    if (!cats.includes(activeCategory)) activeCategory = "All";
+    $filters.innerHTML = "";
+    cats.forEach(cat => {
+      const btn = document.createElement("button");
+      btn.className = "chip" + (cat === activeCategory ? " active" : "");
+      btn.textContent = cat;
+      btn.addEventListener("click", () => {
+        activeCategory = cat;
+        renderFilters();
+        renderGrid();
+      });
+      $filters.appendChild(btn);
+    });
+  }
+
+  function renderDatalist() {
+    $catList.innerHTML = categories().map(c => `<option value="${escapeHtml(c)}"></option>`).join("");
+  }
+
+  function visibleBookmarks() {
+    const term = searchTerm.trim().toLowerCase();
+    return bookmarks
+      .filter(b => {
+        const matchesCat = activeCategory === "All" || b.category === activeCategory;
+        const matchesSearch = !term ||
+          b.title.toLowerCase().includes(term) ||
+          (b.category || "").toLowerCase().includes(term);
+        return matchesCat && matchesSearch;
+      })
+      .sort((a, b) => (b.favorite ? 1 : 0) - (a.favorite ? 1 : 0));
+  }
+
+  function renderGrid() {
+    const list = visibleBookmarks();
+    $count.textContent = list.length
+      ? `${list.length} bookmark${list.length === 1 ? "" : "s"}`
+      : "";
+
+    if (!list.length) {
+      $grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+        <div class="big">📭</div>
+        <p>No bookmarks match your search.</p>
+      </div>`;
+      return;
+    }
+
+    $grid.innerHTML = list.map(b => `
+      <article class="bookmark${b.favorite ? " favorite" : ""}">
+        <div class="top">
+          <h3><a href="${escapeHtml(b.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.title)}</a></h3>
+          <div class="card-actions">
+            <button class="fav-btn${b.favorite ? " on" : ""}" data-id="${escapeHtml(b.id)}" title="${b.favorite ? "Remove from favorites" : "Mark as favorite"}" aria-label="${b.favorite ? "Remove from favorites" : "Mark as favorite"}" aria-pressed="${b.favorite ? "true" : "false"}">${b.favorite ? "★" : "☆"}</button>
+            <button class="edit-btn" data-id="${escapeHtml(b.id)}" title="Edit bookmark" aria-label="Edit ${escapeHtml(b.title)}">&#9998;</button>
+            <button class="del-btn" data-id="${escapeHtml(b.id)}" title="Delete bookmark" aria-label="Delete ${escapeHtml(b.title)}">&times;</button>
+          </div>
+        </div>
+        <a class="url" href="${escapeHtml(b.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(b.url)}</a>
+        <span class="cat-tag">${escapeHtml(b.category || "Uncategorized")}</span>
+        ${b.notes ? `<p class="notes">${escapeHtml(b.notes)}</p>` : ""}
+      </article>
+    `).join("");
+
+    $grid.querySelectorAll(".del-btn").forEach(btn => {
+      btn.addEventListener("click", () => deleteBookmark(btn.dataset.id));
+    });
+
+    $grid.querySelectorAll(".fav-btn").forEach(btn => {
+      btn.addEventListener("click", () => toggleFavorite(btn.dataset.id));
+    });
+
+    $grid.querySelectorAll(".edit-btn").forEach(btn => {
+      btn.addEventListener("click", () => openEdit(btn.dataset.id));
+    });
+  }
+
+  function openEdit(id) {
+    const bm = bookmarks.find(b => b.id === id);
+    if (!bm) return;
+    editingId = id;
+    $eTitle.value = bm.title;
+    $eUrl.value = bm.url;
+    $eCategory.value = bm.category || "";
+    $eNotes.value = bm.notes || "";
+    $editOverlay.classList.add("open");
+    $eTitle.focus();
+  }
+
+  function closeEdit() {
+    editingId = null;
+    $editOverlay.classList.remove("open");
+  }
+
+  $editForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const bm = bookmarks.find(b => b.id === editingId);
+    if (!bm) { closeEdit(); return; }
+    let url = $eUrl.value.trim();
+    if (url && !/^https?:\/\//i.test(url)) url = "https://" + url;
+    bm.title = $eTitle.value.trim();
+    bm.url = url;
+    bm.category = $eCategory.value.trim();
+    bm.notes = $eNotes.value.trim();
+    save();
+    closeEdit();
+    renderAll();
+  });
+
+  document.getElementById("edit-cancel").addEventListener("click", closeEdit);
+  $editOverlay.addEventListener("click", e => {
+    if (e.target === $editOverlay) closeEdit();
+  });
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && $editOverlay.classList.contains("open")) closeEdit();
+  });
+
+  function toggleFavorite(id) {
+    const bm = bookmarks.find(b => b.id === id);
+    if (!bm) return;
+    bm.favorite = !bm.favorite;
+    save();
+    renderGrid();
+  }
+
+  function deleteBookmark(id) {
+    const bm = bookmarks.find(b => b.id === id);
+    if (bm && !confirm(`Delete "${bm.title}"?`)) return;
+    bookmarks = bookmarks.filter(b => b.id !== id);
+    save();
+    renderAll();
+  }
+
+  function renderAll() {
+    renderFilters();
+    renderDatalist();
+    renderGrid();
+  }
+
+  $form.addEventListener("submit", e => {
+    e.preventDefault();
+    addBookmark({
+      title: $title.value,
+      url: $url.value,
+      category: $category.value,
+      notes: $notes.value
+    });
+    $form.reset();
+    $title.focus();
+    renderAll();
+  });
+
+  $search.addEventListener("input", () => {
+    searchTerm = $search.value;
+    renderGrid();
+  });
+
+  /* ===================================================================
+   * Automatic Bookmark Suggestions — dashboard side of the extension link
+   * =================================================================== */
+  const AutoSuggest = (function () {
+    const CACHE_KEY = "my-bookmarks-app.autosuggest";
+    const SC = window.SuggestCore || null;
+    const PROTOCOL = SC ? SC.PROTOCOL : "bookmark-suggest/v1";
+
+    let nonce = null;
+    let connected = false;
+    let everConnected = false;
+    let helloTimer = null;
+    let syncTimer = null;
+    let state = { settings: null, suggestions: [], dismissedCount: 0 };
+
+    const $panel = document.getElementById("suggestions");
+    const $body = document.getElementById("sugg-body");
+    const $countBadge = document.getElementById("sugg-count");
+    const $bulk = document.getElementById("sugg-bulk");
+
+    /* ---------- offline render cache ---------- */
+    function loadCache() {
+      try {
+        const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+        if (c && typeof c === "object") {
+          state.settings = c.settings || null;
+          state.suggestions = Array.isArray(c.suggestions) ? c.suggestions : [];
+          state.dismissedCount = c.dismissedCount || 0;
+        }
+      } catch (e) { /* ignore */ }
+    }
+    function saveCache() {
+      try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify({
+          settings: state.settings, suggestions: state.suggestions,
+          dismissedCount: state.dismissedCount, cachedAt: Date.now()
+        }));
+      } catch (e) { /* ignore */ }
+    }
+
+    /* ---------- messaging ---------- */
+    function post(action, payload) {
+      if (action !== "hello" && !nonce) return;
+      window.postMessage({ protocol: PROTOCOL, dir: "page->ext", nonce: nonce, action: action, payload: payload || {} }, "*");
+    }
+
+    window.addEventListener("message", (e) => {
+      if (e.source !== window) return;
+      const d = e.data;
+      if (!d || d.protocol !== PROTOCOL || d.dir !== "ext->page") return;
+      if (typeof d.nonce === "string") nonce = d.nonce;
+
+      if (d.type === "hello" || d.type === "snapshot") {
+        connected = true; everConnected = true;
+        clearTimeout(helloTimer); helloTimer = null;
+      }
+      if (d.type === "snapshot") {
+        state.settings = d.settings || state.settings;
+        state.suggestions = SC ? SC.sortNewestFirst(d.suggestions || []) : (d.suggestions || []);
+        state.dismissedCount = d.dismissedCount || 0;
+        saveCache();
+        render();
+        renderSettings();
+        // send our current bookmark index so the worker can dedupe
+        syncIndex(true);
+      } else if (d.type === "error") {
+        showToast("Suggestions: " + (d.message || "sync error"), "error");
+        render();
+      }
+    });
+
+    /* ---------- push normalized bookmark index to the extension ---------- */
+    function syncIndex(immediate) {
+      if (!SC || !nonce) return;
+      clearTimeout(syncTimer);
+      const run = () => post("syncBookmarkIndex", SC.buildBookmarkIndex(bookmarks));
+      if (immediate) run(); else syncTimer = setTimeout(run, 300);
+    }
+
+    /* ---------- accept / dismiss ---------- */
+    function scope() { return state.settings && state.settings.dedupeScope === "domain" ? "domain" : "exact"; }
+
+    function saveOne(id) {
+      const s = state.suggestions.find(x => x.id === id);
+      if (!s) return;
+      const dupe = SC ? SC.findBookmarkDuplicate(bookmarks, s.rawUrl || s.url, scope()) : null;
+      if (!dupe) addBookmark({ title: s.title, url: s.url, category: s.category || "Unsorted", notes: "" });
+      post("save", { id: id });
+      state.suggestions = state.suggestions.filter(x => x.id !== id);
+      saveCache();
+      renderAll();
+      render();
+      showToast(dupe ? "Already bookmarked — cleared from suggestions" : "Saved to bookmarks", "success");
+    }
+
+    function dismissOne(id) {
+      post("dismiss", { id: id });
+      state.suggestions = state.suggestions.filter(x => x.id !== id);
+      saveCache();
+      render();
+      showToast("Suggestion dismissed");
+    }
+
+    function saveAll() {
+      const items = state.suggestions.slice();
+      if (!items.length) return;
+      if (!confirm("Save all " + items.length + " suggested bookmark" + (items.length === 1 ? "" : "s") + "?")) return;
+      const ids = [];
+      let added = 0;
+      items.forEach(s => {
+        const dupe = SC ? SC.findBookmarkDuplicate(bookmarks, s.rawUrl || s.url, scope()) : null;
+        if (!dupe) { addBookmark({ title: s.title, url: s.url, category: s.category || "Unsorted", notes: "" }); added++; }
+        ids.push(s.id);
+      });
+      post("saveMany", { ids: ids });
+      state.suggestions = [];
+      saveCache();
+      renderAll();
+      render();
+      showToast("Saved " + added + " bookmark" + (added === 1 ? "" : "s"), "success");
+    }
+
+    function dismissAll() {
+      const n = state.suggestions.length;
+      if (!n) return;
+      if (!confirm("Dismiss all " + n + " suggestion" + (n === 1 ? "" : "s") + "? They won't be suggested again unless you clear the dismissed history.")) return;
+      post("dismissAll");
+      state.suggestions = [];
+      saveCache();
+      render();
+      showToast("Dismissed " + n + " suggestion" + (n === 1 ? "" : "s"));
+    }
+
+    /* ---------- rendering ---------- */
+    function fmtTime(ts) {
+      const d = new Date(ts);
+      if (isNaN(d.getTime())) return "";
+      const diff = Date.now() - ts;
+      if (diff < 60000) return "just now";
+      if (diff < 3600000) return Math.floor(diff / 60000) + " min ago";
+      const sameDay = d.toDateString() === new Date().toDateString();
+      const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+      return (sameDay ? "today " : d.toLocaleDateString([], { month: "short", day: "numeric" }) + " ") + time;
+    }
+
+    function stateBlock(icon, title, msg, actionLabel) {
+      return '<div class="sugg-state"><div class="big">' + icon + '</div>' +
+        '<p class="sst-title">' + escapeHtml(title) + '</p>' +
+        '<p>' + escapeHtml(msg) + '</p>' +
+        (actionLabel ? '<button class="btn btn-ghost" id="sugg-state-action" type="button">' + escapeHtml(actionLabel) + '</button>' : '') +
+        '</div>';
+    }
+
+    function cardHtml(s) {
+      const fb = escapeHtml(String(s.title || s.domain || "?").trim().slice(0, 1).toUpperCase() || "?");
+      const favEl = s.favicon
+        ? '<img class="sugg-fav" src="' + escapeHtml(s.favicon) + '" alt="" referrerpolicy="no-referrer" data-fb="' + fb + '">'
+        : '<span class="sugg-fav sugg-fav-fb">' + fb + '</span>';
+      return '' +
+        '<article class="sugg-card">' +
+          '<div class="sugg-head">' + favEl +
+            '<div class="sugg-meta">' +
+              '<p class="sugg-title" title="' + escapeHtml(s.title) + '">' + escapeHtml(s.title) + '</p>' +
+              '<a class="sugg-url" href="' + escapeHtml(s.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(s.url) + '</a>' +
+            '</div>' +
+          '</div>' +
+          '<p class="sugg-time">Detected ' + escapeHtml(fmtTime(s.detectedAt)) + '</p>' +
+          '<div class="sugg-cat-row"><label>Category</label>' +
+            '<input type="text" list="cat-list" value="' + escapeHtml(s.category || "Unsorted") + '" data-cat="' + escapeHtml(s.id) + '"></div>' +
+          '<div class="sugg-actions">' +
+            '<button class="btn" type="button" data-save="' + escapeHtml(s.id) + '">Yes, Save</button>' +
+            '<button class="btn btn-ghost" type="button" data-dismiss="' + escapeHtml(s.id) + '">No, Dismiss</button>' +
+          '</div>' +
+        '</article>';
+    }
+
+    function render() {
+      if (!$panel) return;
+      const n = state.suggestions.length;
+      $countBadge.textContent = String(n);
+      $countBadge.style.display = n ? "" : "none";
+      $bulk.style.display = n ? "" : "none";
+
+      if (!SC) {
+        $body.innerHTML = stateBlock("&#9888;&#65039;", "Suggestion engine missing",
+          "extension/shared/suggest-core.js could not load next to index.html. Keep the project folder intact.");
+        return;
+      }
+
+      if (!connected && n === 0) {
+        $body.innerHTML = helloTimer
+          ? stateBlock("&#8987;", "Connecting…", "Looking for the Bookmark Suggestions extension.")
+          : stateBlock("&#129513;", "Extension not detected",
+              "Install the companion browser extension to collect suggestions as you browse. Setup takes about two minutes — see README.md.", "Retry");
+        const a = document.getElementById("sugg-state-action");
+        if (a) a.addEventListener("click", () => { everConnected = false; connected = false; startHandshake(); render(); });
+        return;
+      }
+
+      const s = state.settings || {};
+      const paused = s.pausedUntil && Date.now() < s.pausedUntil;
+      let banner = "";
+      if (!connected) {
+        banner += '<div class="sugg-paused">Showing the last synced list — the extension isn’t responding right now. Actions will apply when it reconnects.</div>';
+      }
+      if (paused) {
+        banner += '<div class="sugg-paused">Suggestions paused until ' + escapeHtml(fmtTime(s.pausedUntil)) +
+          '. <button class="linklike" id="sugg-resume" type="button">Resume now</button></div>';
+      }
+
+      if (!n) {
+        $body.innerHTML = banner + stateBlock("&#10024;", "No new suggestions",
+          "Browse around — pages you visit that aren't already bookmarked will show up here.");
+        wireResume();
+        return;
+      }
+
+      $body.innerHTML = banner + '<div class="sugg-list">' + state.suggestions.map(cardHtml).join("") + '</div>';
+      wireResume();
+      $body.querySelectorAll("img.sugg-fav").forEach(img => {
+        img.addEventListener("error", () => {
+          const span = document.createElement("span");
+          span.className = "sugg-fav sugg-fav-fb";
+          span.textContent = img.dataset.fb || "?";
+          img.replaceWith(span);
+        });
+      });
+      $body.querySelectorAll("[data-save]").forEach(b => b.addEventListener("click", () => saveOne(b.dataset.save)));
+      $body.querySelectorAll("[data-dismiss]").forEach(b => b.addEventListener("click", () => dismissOne(b.dataset.dismiss)));
+      $body.querySelectorAll("[data-cat]").forEach(inp => inp.addEventListener("input", () => {
+        const item = state.suggestions.find(x => x.id === inp.dataset.cat);
+        if (item) { item.category = inp.value; saveCache(); }
+      }));
+    }
+
+    function wireResume() {
+      const r = document.getElementById("sugg-resume");
+      if (r) r.addEventListener("click", () => { post("updateSettings", { pausedUntil: 0 }); showToast("Suggestions resumed"); });
+    }
+
+    function renderSettings() {
+      const $b = document.getElementById("as-body");
+      if (!$b) return;
+      const s = state.settings;
+      if (!connected || !s) {
+        $b.innerHTML = '<p class="as-note">Connect the browser extension to change these settings. See README.md for setup.</p>';
+        return;
+      }
+      const paused = s.pausedUntil && Date.now() < s.pausedUntil;
+      const row = (label, sub, control) =>
+        '<div class="as-row"><div><p class="as-label">' + label + '</p><p class="as-sub">' + sub + '</p></div>' + control + '</div>';
+      const sw = (key, on) =>
+        '<label class="sw"><input type="checkbox" data-s="' + key + '"' + (on ? " checked" : "") + '><span></span></label>';
+
+      $b.innerHTML =
+        row("Enable automatic suggestions", "Master switch for detecting the pages you visit.", sw("enabled", s.enabled !== false)) +
+        row("Suggest once per exact URL", "After you dismiss a URL, don't offer that exact URL again.", sw("suggestOncePerUrl", !!s.suggestOncePerUrl)) +
+        row("Treat a whole domain as one website", "One suggestion per site instead of per page; also skips a domain you've already bookmarked or dismissed.", sw("dedupeScope", s.dedupeScope === "domain")) +
+        row("Development mode", "Also suggest localhost / private-network / *.local pages (ignored by default).", sw("devMode", !!s.devMode)) +
+        row("Monitor incognito windows", "Also needs “Allow in incognito” enabled for the extension in your browser.", sw("monitorIncognito", !!s.monitorIncognito)) +
+        row("Pause suggestions", paused ? "Paused until " + escapeHtml(fmtTime(s.pausedUntil)) + "." : "Not paused.",
+          '<div class="as-pause-btns">' +
+            '<button class="chip" type="button" data-pause="3600000">1 hour</button>' +
+            '<button class="chip" type="button" data-pause="86400000">Until tomorrow</button>' +
+            '<button class="chip" type="button" data-pause="0">Off</button></div>') +
+        row("Dismissed website history", state.dismissedCount + " URL" + (state.dismissedCount === 1 ? "" : "s") + " currently blocked from being suggested again.",
+          '<button class="btn btn-ghost" type="button" data-clear-dismissed' + (state.dismissedCount ? "" : " disabled") + '>Clear</button>');
+
+      $b.querySelectorAll("input[data-s]").forEach(inp => inp.addEventListener("change", () => {
+        const k = inp.dataset.s;
+        const payload = {};
+        if (k === "dedupeScope") payload.dedupeScope = inp.checked ? "domain" : "exact";
+        else payload[k] = inp.checked;
+        post("updateSettings", payload);
+      }));
+      $b.querySelectorAll("[data-pause]").forEach(btn => btn.addEventListener("click", () => {
+        const ms = Number(btn.dataset.pause) || 0;
+        post("updateSettings", { pausedUntil: ms ? Date.now() + ms : 0 });
+        showToast(ms ? "Suggestions paused" : "Suggestions resumed");
+      }));
+      const cd = $b.querySelector("[data-clear-dismissed]");
+      if (cd) cd.addEventListener("click", () => {
+        if (!confirm("Clear the dismissed website history? Previously dismissed sites can be suggested again.")) return;
+        post("clearDismissed");
+        showToast("Dismissed history cleared");
+      });
+    }
+
+    function startHandshake() {
+      if (!SC || connected) { render(); return; }
+      clearTimeout(helloTimer);
+      post("hello");
+      helloTimer = setTimeout(() => { helloTimer = null; if (!connected) { render(); renderSettings(); } }, 1600);
+    }
+
+    function init() {
+      if (!$panel) return;
+      loadCache();
+      const sa = document.getElementById("sugg-save-all");
+      const da = document.getElementById("sugg-dismiss-all");
+      if (sa) sa.addEventListener("click", saveAll);
+      if (da) da.addEventListener("click", dismissAll);
+      startHandshake();
+      render();
+      renderSettings();
+      // The content script injects at document_idle — retry the handshake a few
+      // times early, then settle into a slow poll for a sleeping service worker.
+      [400, 1200, 3000, 6000].forEach(ms => setTimeout(() => { if (!connected) startHandshake(); }, ms));
+      setInterval(() => { if (!connected) startHandshake(); }, 30000);
+      document.addEventListener("visibilitychange", () => {
+        if (!document.hidden && !connected) startHandshake();
+      });
+    }
+
+    init();
+    return { syncIndex: syncIndex };
+  })();
+  window.__AutoSuggest = AutoSuggest;
+
+  renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Bookmark Dashboard &amp; Bookmark Suggestions</title>
+<style>
+  :root {
+    --blue-600: #2563eb;
+    --slate-50: #f8fafc;
+    --slate-200: #e2e8f0;
+    --slate-500: #64748b;
+    --slate-700: #334155;
+    --slate-900: #0f172a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: var(--slate-900);
+    line-height: 1.6;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 48px 20px 80px;
+    background: #fff;
+  }
+  h1 { font-size: 1.6rem; margin-bottom: 4px; }
+  .updated { color: var(--slate-500); font-size: 0.9rem; margin-bottom: 32px; }
+  h2 { font-size: 1.15rem; margin: 32px 0 10px; }
+  p, li { color: var(--slate-700); }
+  ul { padding-left: 22px; }
+  li { margin-bottom: 6px; }
+  .badge {
+    display: inline-block; background: var(--slate-50); border: 1px solid var(--slate-200);
+    color: var(--blue-600); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.04em;
+    text-transform: uppercase; padding: 4px 10px; border-radius: 999px; margin-bottom: 20px;
+  }
+  code {
+    background: var(--slate-50); border: 1px solid var(--slate-200); border-radius: 4px;
+    padding: 1px 6px; font-size: 0.92em;
+  }
+  a { color: var(--blue-600); }
+</style>
+</head>
+<body>
+
+<div class="badge">No data collected</div>
+<h1>Privacy Policy</h1>
+<p class="updated">Bookmark Dashboard &amp; the Bookmark Suggestions browser extension · Last updated September 2, 2026</p>
+
+<p>
+  The short version: this project does not collect, transmit, sell, or share any of your data,
+  because it has no server to send it to. Everything — your bookmarks, your automatic-suggestion
+  settings, and the pages the extension has noticed — stays inside your own browser, on your own
+  device.
+</p>
+
+<h2>What data exists, and where it lives</h2>
+<ul>
+  <li><strong>Your bookmarks</strong> (title, URL, category, notes, favorite flag) are stored in the
+    dashboard page's own <code>localStorage</code>, in the browser you opened it in.</li>
+  <li><strong>Automatic-suggestion data</strong> (pending suggestions, dismissed URLs, your settings
+    like pause state or dedupe mode) is stored in the extension's <code>chrome.storage.local</code>,
+    which is private to your browser profile and this extension.</li>
+  <li>The dashboard page and the extension exchange this data with each other, on your device only,
+    through the browser's own messaging APIs.</li>
+</ul>
+
+<h2>What we don't do</h2>
+<ul>
+  <li>No servers. There is no backend anywhere in this project — nothing to send data to even if we wanted to.</li>
+  <li>No accounts, sign-ups, emails, or passwords.</li>
+  <li>No analytics, telemetry, crash reporting, or usage tracking of any kind.</li>
+  <li>No advertising, and no data is ever sold or shared with any third party.</li>
+  <li>No browsing history is recorded. The extension only looks at the URL, title, and favicon of the
+    tab currently in front of you, decides in real time whether it's worth suggesting, and — if not —
+    forgets it immediately.</li>
+</ul>
+
+<h2>Permissions the extension requests, and why</h2>
+<ul>
+  <li><code>tabs</code> — to read the URL, title, and favicon of the active tab so it can decide
+    whether to suggest it as a bookmark. The extension does not read page content and has no
+    <code>host_permissions</code> to inject scripts into the sites you visit.</li>
+  <li><code>storage</code> — to save your suggestions, dismissed list, and settings locally via
+    <code>chrome.storage.local</code>, so they persist between browser sessions on this device.</li>
+</ul>
+<p>That's the complete permission list. No <code>host_permissions</code>, no <code>scripting</code>,
+  no <code>webNavigation</code>, no <code>history</code>, and no access to incognito windows unless
+  you explicitly turn it on in both the browser's extension settings and the dashboard.</p>
+
+<h2>Favicons</h2>
+<p>
+  Suggestion cards may load a small favicon image directly from the site it belongs to (or from an
+  embedded <code>data:</code> image), using <code>referrerpolicy="no-referrer"</code> so the request
+  doesn't leak which page referred it. This is the same as your browser tab already does when
+  showing that site's icon — no separate service is involved.
+</p>
+
+<h2>Your data, your control</h2>
+<ul>
+  <li>Uninstalling the extension or clearing your browser's site data for the dashboard removes all
+    stored data immediately — there is nothing left on any server to delete, because none exists.</li>
+  <li>Bookmarks, suggestions, and settings are local to one browser profile on one device. They are
+    never synced anywhere by this project (your browser's own built-in sync, if enabled, is a
+    separate feature outside this project's control).</li>
+</ul>
+
+<h2>Changes to this policy</h2>
+<p>
+  If this project ever adds a feature that changes any of the above (for example, an optional
+  server-based sync), this page will be updated first and the "Last updated" date at the top will
+  change accordingly.
+</p>
+
+<h2>Contact</h2>
+<p>
+  Questions about this policy or the project can be raised via the project's GitHub repository
+  (issues) once it's public, or by contacting the developer directly.
+</p>
+
+</body>
+</html>

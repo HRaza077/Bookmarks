@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>suggest-core tests</title>
+<style>
+  body { font-family: -apple-system, "Segoe UI", Roboto, sans-serif; margin: 24px; background: #f8fafc; color: #0f172a; }
+  h1 { font-size: 1.2rem; }
+  #summary { font-weight: 700; margin: 12px 0 18px; padding: 10px 14px; border-radius: 8px; }
+  .ok { background: #dcfce7; color: #166534; }
+  .fail { background: #fee2e2; color: #991b1b; }
+  ul { list-style: none; padding: 0; }
+  li { padding: 6px 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+  li.p::before { content: "PASS  "; color: #16a34a; font-weight: 700; }
+  li.f::before { content: "FAIL  "; color: #dc2626; font-weight: 700; }
+  li .err { display: block; color: #b91c1c; font-size: 0.82rem; margin-top: 3px; white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<h1>suggest-core.js — test runner</h1>
+<div id="summary">Running…</div>
+<ul id="list"></ul>
+
+<script src="../extension/shared/suggest-core.js"></script>
+<script src="cases.js"></script>
+<script>
+  (function () {
+    var SC = window.SuggestCore;
+    var assert = {
+      ok: function (v, m) { if (!v) throw new Error(m || "expected truthy, got " + fmt(v)); },
+      equal: function (a, b, m) { if (a !== b) throw new Error((m ? m + ": " : "") + "expected " + fmt(b) + ", got " + fmt(a)); },
+      notEqual: function (a, b, m) { if (a === b) throw new Error((m ? m + ": " : "") + "expected values to differ, both " + fmt(a)); }
+    };
+    function fmt(v) { try { return JSON.stringify(v); } catch (e) { return String(v); } }
+
+    var cases = window.SuggestCases(SC);
+    var list = document.getElementById("list");
+    var pass = 0, fail = 0;
+
+    cases.forEach(function (c) {
+      var li = document.createElement("li");
+      try {
+        c.fn(assert);
+        li.className = "p";
+        li.textContent = c.name;
+        pass++;
+      } catch (e) {
+        li.className = "f";
+        li.textContent = c.name;
+        var err = document.createElement("span");
+        err.className = "err";
+        err.textContent = (e && e.stack) || String(e);
+        li.appendChild(err);
+        fail++;
+      }
+      list.appendChild(li);
+    });
+
+    var s = document.getElementById("summary");
+    s.textContent = pass + " passed, " + fail + " failed  (" + cases.length + " total)";
+    s.className = fail ? "fail" : "ok";
+    document.title = (fail ? "FAIL " : "PASS ") + s.textContent;
+    window.__TEST_RESULT__ = { pass: pass, fail: fail, total: cases.length };
+  })();
+</script>
+</body>
+</html>
