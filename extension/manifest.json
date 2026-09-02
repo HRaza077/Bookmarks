@@ -24,7 +24,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["file:///*/my-bookmarks-app/*"],
+      "matches": ["file:///*/my-bookmarks-app/*", "file:///*/Bookmarks/*", "file:///*/bookmarks/*"],
       "js": ["shared/suggest-core.js", "bridge.js"],
       "run_at": "document_idle"
     }

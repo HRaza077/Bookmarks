@@ -10,8 +10,8 @@ dashboard talk to each other through the browser's own per‑extension
 `chrome.storage.local`, relayed to the dashboard page by a content script using a
 per‑page random nonce and a strict, validated message allow‑list.
 
-**Repository:** <https://github.com/HRaza077/my-bookmarks-app> · Issues and questions welcome there.
-**Live demo:** <https://hraza077.github.io/my-bookmarks-app/> · **Privacy policy:** <https://hraza077.github.io/my-bookmarks-app/privacy.html>
+**Repository:** <https://github.com/HRaza077/Bookmarks> · Issues and questions welcome there.
+**Live demo:** <https://hraza077.github.io/Bookmarks/> · **Privacy policy:** <https://hraza077.github.io/Bookmarks/privacy.html>
 
 ## Screenshot
 
@@ -20,7 +20,7 @@ per‑page random nonce and a strict, validated message allow‑list.
 | ![Bookmark Dashboard, light mode](docs/screenshot-light.png) | ![Bookmark Dashboard, dark mode](docs/screenshot-dark.png) |
 
 ```
-my-bookmarks-app/
+my-bookmarks-app/   (a git clone makes this "Bookmarks/" — either name works, see §8)
 ├─ index.html                     the dashboard (open this)
 ├─ privacy.html                   plain-language privacy policy
 ├─ extension/                     the MV3 extension (load this unpacked)
@@ -206,9 +206,12 @@ There is no separate lint / type‑check / build step in this project.
 - **No network traffic.** No backend, no third‑party calls, no telemetry.
 - **Minimal permissions**: `tabs`, `storage`. No `host_permissions`, no
   `scripting`, no `webNavigation`, no `history`, no `<all_urls>` content scripts.
-- The content script runs only on the dashboard file (matched by path and
-  re‑checked via a `<meta name="bookmark-dashboard">` marker) and exposes **no**
-  `chrome.*` API to the page — only a fixed list of validated operations.
+- The content script runs only on `file://` paths inside a folder named
+  `my-bookmarks-app` / `Bookmarks` (the manifest `content_scripts[0].matches`),
+  and each run re‑checks for the `<meta name="bookmark-dashboard">` marker before
+  doing anything. It exposes **no** `chrome.*` API to the page — only a fixed
+  list of validated operations. If your folder has a different name, add it to
+  that `matches` array and reload the extension.
 - Page → extension messages require the per‑load random **nonce**; unknown
   actions and malformed payloads are dropped.
 - Favicons are constrained to `http(s)` URLs or small `data:image/*` URIs and
@@ -236,7 +239,7 @@ There is no separate lint / type‑check / build step in this project.
 - To publish the extension to the Chrome Web Store / Edge Add‑ons you'd add a
   store listing, a proper icon set, bump `version`, and host `privacy.html` at a
   public URL (e.g. enable GitHub Pages on this repo → the store listing links to
-  `https://hraza077.github.io/my-bookmarks-app/privacy.html`).
+  `https://hraza077.github.io/Bookmarks/privacy.html`).
 
 ## 10. License & privacy
 
