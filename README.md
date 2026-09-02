@@ -10,6 +10,8 @@ dashboard talk to each other through the browser's own per‑extension
 `chrome.storage.local`, relayed to the dashboard page by a content script using a
 per‑page random nonce and a strict, validated message allow‑list.
 
+**Repository:** <https://github.com/HRaza077/my-bookmarks-app> · Issues and questions welcome there.
+
 ## Screenshot
 
 | Light | Dark |
@@ -19,18 +21,24 @@ per‑page random nonce and a strict, validated message allow‑list.
 ```
 my-bookmarks-app/
 ├─ index.html                     the dashboard (open this)
+├─ privacy.html                   plain-language privacy policy
 ├─ extension/                     the MV3 extension (load this unpacked)
 │  ├─ manifest.json
 │  ├─ background.js               service worker – watches tabs, builds suggestions
 │  ├─ bridge.js                   content script – syncs storage <-> dashboard page
 │  ├─ popup.js / popup.html       toolbar popup – quick enable / pause / counts
 │  ├─ icons/
-│  └─ shared/suggest-core.js      URL normalization, dedupe, message validation (shared + tested)
+│  └─ shared/suggest-core.js      URL normalization, dedupe, message validation
+│                                 (the ONE canonical copy — loaded by the worker,
+│                                 the content script, the dashboard, and the tests)
 ├─ tests/
 │  ├─ run.html                    double‑click test runner (no tooling needed)
-│  ├─ run-node.mjs                `node --test` runner (optional)
+│  ├─ run-node.mjs                `node --test` runner (used by CI)
 │  └─ cases.js                    shared test cases
 ├─ tools/static-server.ps1        dev helper – serve the folder over http://localhost
+├─ docs/                          screenshots used in this README
+├─ .github/workflows/test.yml     CI – runs the test suite on push / PR
+├─ LICENSE                        MIT
 └─ README.md
 ```
 
@@ -192,8 +200,10 @@ There is no separate lint / type‑check / build step in this project.
 - **Local to one browser profile.** Bookmarks and suggestions do not sync across
   machines or browsers. Cross‑device sync would require a backend with real
   authentication — deliberately out of scope.
-- **`suggest-core.js` has two copies on disk** (one canonical, loaded by the
-  dashboard, the extension worker, and the tests). If you edit it, it's one file.
+- **`index.html` is no longer strictly single-file** — it loads
+  `extension/shared/suggest-core.js` with a `<script src>` tag, so the `extension/`
+  folder must sit next to it. Opened without that file, the dashboard still runs
+  but the suggestions section shows a setup message.
 - Domain matching uses “hostname minus `www.`”, not the Public Suffix List, so
   `foo.github.io` and `bar.github.io` are treated as different domains, and
   `a.example.co.uk` / `b.example.co.uk` are also treated as different. Fine for
@@ -202,7 +212,9 @@ There is no separate lint / type‑check / build step in this project.
   history‑API‑only transitions on unusual sites may be missed (adding the
   `webNavigation` permission would fix this but was intentionally avoided).
 - To publish the extension to the Chrome Web Store / Edge Add‑ons you'd add a
-  store listing, a proper icon set, a privacy policy page, and bump `version`.
+  store listing, a proper icon set, bump `version`, and host `privacy.html` at a
+  public URL (e.g. enable GitHub Pages on this repo → the store listing links to
+  `https://hraza077.github.io/my-bookmarks-app/privacy.html`).
 
 ## 10. License & privacy
 
