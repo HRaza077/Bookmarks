@@ -11,7 +11,7 @@ dashboard talk to each other through the browser's own per‑extension
 per‑page random nonce and a strict, validated message allow‑list.
 
 **Repository:** <https://github.com/HRaza077/Bookmarks> · Issues and questions welcome there.
-**Live demo:** <https://hraza077.github.io/Bookmarks/> · **Privacy policy:** <https://hraza077.github.io/Bookmarks/privacy.html>
+**Live demo:** <https://bookmarks.skillihire.com/> · **Privacy policy:** <https://bookmarks.skillihire.com/privacy.html>
 
 ## Screenshot
 
@@ -64,42 +64,37 @@ for 14 days. Once the extension connects even once, the prompt never returns, an
 the dashboard re‑detects it automatically when you come back to the tab.
 
 > A web page can't install a browser extension for you — that click has to happen
-> on the Chrome Web Store / Edge Add‑ons page, or as an unpacked developer
-> install. The extension isn't in a store yet, so use the steps below (this is
-> also where **Not now** / the panel's **Retry** button lead).
+> on the store page or as an unpacked developer install.
 
-### Chrome
+### Chrome — from the Web Store (easiest)
 
-1. Go to `chrome://extensions`.
-2. Turn on **Developer mode** (top‑right).
+Install **[Bookmark Suggestions — My Bookmarks Dashboard](https://chromewebstore.google.com/detail/fpoigiacknejflnlpeadbfbjapbodllc)**,
+then refresh `index.html`. If you run the dashboard from a `file://` path
+(rather than <https://bookmarks.skillihire.com/>), also open the extension's
+**Details** and turn **ON “Allow access to file URLs.”**
+
+### Chrome / Edge — unpacked (dev, or while the Edge listing is pending)
+
+1. Open `chrome://extensions` (or `edge://extensions`).
+2. Turn on **Developer mode**.
 3. Click **Load unpacked** and choose the **`extension/`** folder
    (`…/my-bookmarks-app/extension`).
 4. The extension **“Bookmark Suggestions — My Bookmarks Dashboard”** appears.
-5. Click **Details** on that extension and turn **ON**
-   **“Allow access to file URLs.”**
-   *(Required so the extension can talk to `index.html` when you open it from a
-   file. Skip this only if you serve the dashboard over `http://localhost` — see
-   §6.)*
-6. Re‑open / refresh `index.html`. The suggestions section switches to
+5. Click **Details** → turn **ON “Allow access to file URLs”**
+   *(needed only when opening `index.html` from a file — skip it if you use the
+   hosted dashboard or serve over `http://localhost`, see §6).*
+6. Re‑open / refresh the dashboard. The suggestions section switches to
    *“No new suggestions”*. Browse a few sites and they start appearing.
 
-### Microsoft Edge
-
-Identical, at `edge://extensions`:
-
-1. `edge://extensions` → enable **Developer mode** (left sidebar).
-2. **Load unpacked** → choose the `extension/` folder.
-3. **Details** → enable **“Allow access to file URLs.”**
-4. Refresh `index.html`.
-
-The same unpacked folder works in both browsers — no changes needed.
+The same unpacked `extension/` folder works in both browsers unchanged.
 
 ### Dismissed the prompt?
 
 Open the collapsible **Automatic Suggestions** panel on the dashboard and use its
-**Retry** button, or just reload after installing. When `CHROME_STORE_URL` /
-`EDGE_STORE_URL` in `index.html` are filled in (after the extension is
-published), the prompt's **Yes** button opens the matching store page instead.
+**Retry** button, or just reload after installing. `CHROME_STORE_URL` in
+`index.html` is set, so in Chrome the prompt's **Yes** button opens the Web Store
+listing directly; other browsers fall back to these instructions until
+`EDGE_STORE_URL` is filled in.
 
 ---
 
@@ -236,10 +231,11 @@ There is no separate lint / type‑check / build step in this project.
 - SPA in‑page navigations are detected via `tabs.onUpdated` URL changes; a few
   history‑API‑only transitions on unusual sites may be missed (adding the
   `webNavigation` permission would fix this but was intentionally avoided).
-- To publish the extension to the Chrome Web Store / Edge Add‑ons you'd add a
-  store listing, a proper icon set, bump `version`, and host `privacy.html` at a
-  public URL (e.g. enable GitHub Pages on this repo → the store listing links to
-  `https://hraza077.github.io/Bookmarks/privacy.html`).
+- The extension is published on the Chrome Web Store; the Edge Add‑ons listing
+  is pending. Store copy, permission justifications, and the submission
+  checklist live in [`docs/store-listing.md`](docs/store-listing.md). When the
+  Edge listing goes live, paste its URL into `EDGE_STORE_URL` in `index.html`
+  (Chrome's is already wired up).
 
 ## 10. License & privacy
 

@@ -12,3 +12,6 @@ desktop.ini
 # Node (only relevant if you install it later to run tests/CI locally)
 node_modules/
 npm-debug.log*
+
+# Build artifacts (the store-upload zip is produced by docs/store-listing.md §2)
+*.zip

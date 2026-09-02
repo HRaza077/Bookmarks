@@ -1,9 +1,9 @@
 name: Deploy Pages
 
-# Publishes the repo as a static site at
-# https://hraza077.github.io/Bookmarks/
-#   /            -> the dashboard (index.html)
-#   /privacy.html -> the privacy policy (use this URL for store listings)
+# Publishes the repo as a static site. Custom domain (CNAME file):
+# https://bookmarks.skillihire.com/   -> the dashboard (index.html)
+# https://bookmarks.skillihire.com/privacy.html  -> privacy policy (used in the store listings)
+# The old https://hraza077.github.io/Bookmarks/ URL redirects here.
 
 on:
   push:
