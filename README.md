@@ -11,6 +11,7 @@ dashboard talk to each other through the browser's own per‑extension
 per‑page random nonce and a strict, validated message allow‑list.
 
 **Repository:** <https://github.com/HRaza077/my-bookmarks-app> · Issues and questions welcome there.
+**Live demo:** <https://hraza077.github.io/my-bookmarks-app/> · **Privacy policy:** <https://hraza077.github.io/my-bookmarks-app/privacy.html>
 
 ## Screenshot
 
