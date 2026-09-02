@@ -239,6 +239,66 @@
         a.ok(SC.validateExtMessage({ protocol: SC.PROTOCOL, dir: "ext->page", type: "snapshot" }));
         a.equal(SC.validateExtMessage({ protocol: SC.PROTOCOL, dir: "ext->page" }), null);
         a.equal(SC.validateExtMessage({ protocol: "nope", dir: "ext->page", type: "x" }), null);
+      }},
+
+      /* ---------------- first-run install prompt ---------------- */
+      { name: "detectBrowser: Edge desktop UA", fn: function (a) {
+        a.equal(SC.detectBrowser(
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 Edg/120.0.0.0"), "edge");
+      }},
+      { name: "detectBrowser: plain Chrome UA", fn: function (a) {
+        a.equal(SC.detectBrowser(
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"), "chrome");
+      }},
+      { name: "detectBrowser: Firefox and Safari are 'other'", fn: function (a) {
+        a.equal(SC.detectBrowser("Mozilla/5.0 (Windows NT 10.0; rv:121.0) Gecko/20100101 Firefox/121.0"), "other");
+        a.equal(SC.detectBrowser(
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"), "other");
+      }},
+      { name: "detectBrowser: Opera (OPR) is not treated as Chrome", fn: function (a) {
+        a.equal(SC.detectBrowser(
+          "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36 OPR/106.0.0.0"), "other");
+      }},
+      { name: "detectBrowser: userAgentData brands win over UA string", fn: function (a) {
+        a.equal(SC.detectBrowser("…Chrome/120… Safari/537.36",
+          { brands: [{ brand: "Chromium", version: "120" }, { brand: "Microsoft Edge", version: "120" }] }), "edge");
+        a.equal(SC.detectBrowser("…Chrome/120… Safari/537.36",
+          { brands: [{ brand: "Chromium", version: "120" }, { brand: "Google Chrome", version: "120" }] }), "chrome");
+      }},
+      { name: "detectBrowser: missing / junk input is 'other'", fn: function (a) {
+        a.equal(SC.detectBrowser(), "other");
+        a.equal(SC.detectBrowser("", null), "other");
+        a.equal(SC.detectBrowser(123, { brands: "nope" }), "other");
+      }},
+
+      { name: "shouldShowInstallPrompt: shows when settled, unconnected, never dismissed", fn: function (a) {
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, connected: false, everConnected: false, lastDismissedAt: 0 }), true);
+      }},
+      { name: "shouldShowInstallPrompt: hidden while still connecting (not settled)", fn: function (a) {
+        a.equal(SC.shouldShowInstallPrompt({ settled: false, connected: false, everConnected: false }), false);
+      }},
+      { name: "shouldShowInstallPrompt: hidden when connected", fn: function (a) {
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, connected: true, everConnected: false }), false);
+      }},
+      { name: "shouldShowInstallPrompt: hidden forever once everConnected", fn: function (a) {
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, connected: false, everConnected: true, lastDismissedAt: 0 }), false);
+      }},
+      { name: "shouldShowInstallPrompt: 14-day cooldown after a dismissal", fn: function (a) {
+        var now = 1700000000000;
+        var day = 864e5;
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, lastDismissedAt: now - 2 * day, now: now }), false);
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, lastDismissedAt: now - 13.9 * day, now: now }), false);
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, lastDismissedAt: now - 14.1 * day, now: now }), true);
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, lastDismissedAt: now - 40 * day, now: now }), true);
+      }},
+      { name: "shouldShowInstallPrompt: cooldownDays is configurable", fn: function (a) {
+        var now = 1700000000000, day = 864e5;
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, lastDismissedAt: now - 5 * day, now: now, cooldownDays: 3 }), true);
+        a.equal(SC.shouldShowInstallPrompt({ settled: true, lastDismissedAt: now - 5 * day, now: now, cooldownDays: 7 }), false);
+      }},
+      { name: "shouldShowInstallPrompt: tolerates missing ctx", fn: function (a) {
+        a.equal(SC.shouldShowInstallPrompt(), false);          // not settled
+        a.equal(SC.shouldShowInstallPrompt({ settled: true }), true);
       }}
     ];
   };

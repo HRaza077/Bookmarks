@@ -334,6 +334,26 @@
   .modal .field { margin-bottom: 14px; }
   .modal .form-actions { margin-top: 20px; }
 
+  /* First-run install prompt — reuses .modal-overlay / .modal */
+  .install-hero {
+    width: 46px; height: 46px; border-radius: 12px; margin-bottom: 14px;
+    display: grid; place-items: center; font-size: 24px;
+    background: var(--blue-50); border: 1px solid var(--blue-100);
+  }
+  #install-overlay h2 { margin-bottom: 10px; }
+  #install-overlay p { color: var(--slate-700); font-size: 0.92rem; margin-bottom: 12px; }
+  #install-overlay .install-note { color: var(--slate-500); font-size: 0.82rem; }
+  #install-overlay a { color: var(--blue-600); font-weight: 600; text-decoration: underline; }
+  .install-fallback {
+    margin-bottom: 4px; padding: 12px 14px; line-height: 1.5;
+    border: 1px solid var(--slate-200); border-radius: 10px;
+    background: var(--slate-50); color: var(--slate-700); font-size: 0.85rem;
+  }
+  .install-fallback code {
+    background: var(--surface); border: 1px solid var(--slate-200);
+    border-radius: 4px; padding: 0 4px; font-size: 0.92em;
+  }
+
   .btn-ghost {
     background: transparent;
     color: var(--slate-700);
@@ -566,12 +586,50 @@
   </div>
 </div>
 
+<div class="modal-overlay install-modal" id="install-overlay">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="install-heading">
+    <div class="install-hero" aria-hidden="true">🧩</div>
+    <h2 id="install-heading">Get suggested bookmarks as you browse</h2>
+    <p>
+      A small companion browser extension can notice the pages you visit and offer
+      them here as one-click bookmarks — so you stop losing links you meant to save.
+    </p>
+    <p class="install-note">
+      It stays entirely on your device: no account, no server, no browsing history
+      kept beyond what's pending.
+      <a href="privacy.html" target="_blank" rel="noopener noreferrer">Privacy details</a>.
+    </p>
+    <div class="install-fallback" id="install-fallback" hidden>
+      <strong>The extension isn't in a web store yet.</strong>
+      You can still add it in about two minutes — load the <code>extension/</code>
+      folder as an unpacked extension from <code>chrome://extensions</code>
+      (or <code>edge://extensions</code>). Full steps:
+      <a href="https://github.com/HRaza077/my-bookmarks-app#2-install-the-extension" target="_blank" rel="noopener noreferrer">project README</a>.
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn" id="install-yes">Yes, enable suggestions</button>
+      <button type="button" class="btn btn-ghost" id="install-not-now">Not now</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 
 <script src="extension/shared/suggest-core.js"></script>
 <script>
   const STORAGE_KEY = "my-bookmarks-app.bookmarks";
   const THEME_KEY = "my-bookmarks-app.theme";
+  const INSTALL_PROMPT_KEY = "my-bookmarks-app.installPrompt";
+
+  // Store listings for the companion extension. Leave as "" until the extension
+  // is published, then paste the real URLs here — the first-run prompt's
+  // "Yes" button will open the one matching the user's browser.
+  //   Chrome Web Store:  https://chromewebstore.google.com/detail/<slug>/<id>
+  //   Edge Add-ons:      https://microsoftedge.microsoft.com/addons/detail/<id>
+  const CHROME_STORE_URL = "";
+  const EDGE_STORE_URL = "";
+  // Where "Yes" sends people while the store URLs above are still empty.
+  const INSTALL_GUIDE_URL = "https://github.com/HRaza077/my-bookmarks-app#2-install-the-extension";
 
   const SAMPLES = [
     { id: "s1", title: "MDN Web Docs", url: "https://developer.mozilla.org", category: "Development", notes: "Reference for HTML, CSS and JavaScript.", favorite: true },
@@ -850,12 +908,15 @@
     let everConnected = false;
     let helloTimer = null;
     let syncTimer = null;
+    let installSettled = false;      // startup handshake retries have finished
+    let installPromptShown = false;  // one-time guard for this page load
     let state = { settings: null, suggestions: [], dismissedCount: 0 };
 
     const $panel = document.getElementById("suggestions");
     const $body = document.getElementById("sugg-body");
     const $countBadge = document.getElementById("sugg-count");
     const $bulk = document.getElementById("sugg-bulk");
+    const $installOverlay = document.getElementById("install-overlay");
 
     /* ---------- offline render cache ---------- */
     function loadCache() {
@@ -877,6 +938,71 @@
       } catch (e) { /* ignore */ }
     }
 
+    /* ---------- first-run install prompt ----------
+     * A one-time modal nudge shown only when the extension is genuinely not
+     * installed. The "should it show" decision is SuggestCore.shouldShowInstallPrompt;
+     * detection + re-connection is handled by the existing handshake/onChanged logic. */
+    function readInstallPromptState() {
+      try {
+        const s = JSON.parse(localStorage.getItem(INSTALL_PROMPT_KEY) || "null");
+        if (s && typeof s === "object") {
+          return {
+            lastDismissedAt: typeof s.lastDismissedAt === "number" ? s.lastDismissedAt : 0,
+            everConnected: !!s.everConnected
+          };
+        }
+      } catch (e) { /* ignore */ }
+      return { lastDismissedAt: 0, everConnected: false };
+    }
+    function writeInstallPromptState(patch) {
+      const cur = readInstallPromptState();
+      try {
+        localStorage.setItem(INSTALL_PROMPT_KEY, JSON.stringify(Object.assign(cur, patch)));
+      } catch (e) { /* ignore */ }
+    }
+    function markEverConnected() {
+      if (!readInstallPromptState().everConnected) writeInstallPromptState({ everConnected: true });
+    }
+
+    function storeUrlForThisBrowser() {
+      const b = SC ? SC.detectBrowser(navigator.userAgent, navigator.userAgentData) : "other";
+      return b === "edge" ? EDGE_STORE_URL : b === "chrome" ? CHROME_STORE_URL : "";
+    }
+
+    function openInstallModal() {
+      if (!$installOverlay || installPromptShown) return;
+      installPromptShown = true;
+      const hasStore = !!storeUrlForThisBrowser();
+      document.getElementById("install-fallback").hidden = hasStore;
+      $installOverlay.classList.add("open");
+      document.getElementById("install-yes").focus();
+    }
+    function closeInstallModal() {
+      if ($installOverlay) $installOverlay.classList.remove("open");
+    }
+    function dismissInstallModal() {
+      writeInstallPromptState({ lastDismissedAt: Date.now() });
+      closeInstallModal();
+    }
+    function acceptInstall() {
+      const url = storeUrlForThisBrowser() || INSTALL_GUIDE_URL;
+      window.open(url, "_blank", "noopener");
+      closeInstallModal();
+      showToast("Opened the setup page — install it, then switch back to this tab");
+    }
+
+    function maybeShowInstallPrompt() {
+      if (!SC || installPromptShown) return;
+      const st = readInstallPromptState();
+      const show = SC.shouldShowInstallPrompt({
+        connected: connected,
+        everConnected: everConnected || st.everConnected,
+        settled: installSettled,
+        lastDismissedAt: st.lastDismissedAt
+      });
+      if (show) openInstallModal();
+    }
+
     /* ---------- messaging ---------- */
     function post(action, payload) {
       if (action !== "hello" && !nonce) return;
@@ -892,6 +1018,8 @@
       if (d.type === "hello" || d.type === "snapshot") {
         connected = true; everConnected = true;
         clearTimeout(helloTimer); helloTimer = null;
+        markEverConnected();
+        closeInstallModal();  // it connected on its own — no need to nag
       }
       if (d.type === "snapshot") {
         state.settings = d.settings || state.settings;
@@ -1139,6 +1267,16 @@
       const da = document.getElementById("sugg-dismiss-all");
       if (sa) sa.addEventListener("click", saveAll);
       if (da) da.addEventListener("click", dismissAll);
+
+      if ($installOverlay) {
+        document.getElementById("install-yes").addEventListener("click", acceptInstall);
+        document.getElementById("install-not-now").addEventListener("click", dismissInstallModal);
+        $installOverlay.addEventListener("click", e => { if (e.target === $installOverlay) dismissInstallModal(); });
+        document.addEventListener("keydown", e => {
+          if (e.key === "Escape" && $installOverlay.classList.contains("open")) dismissInstallModal();
+        });
+      }
+
       startHandshake();
       render();
       renderSettings();
@@ -1149,6 +1287,9 @@
       document.addEventListener("visibilitychange", () => {
         if (!document.hidden && !connected) startHandshake();
       });
+      // Once the startup handshake window has fully closed and we're still not
+      // connected, offer the one-time install prompt (last retry ends ~7.6s).
+      setTimeout(() => { installSettled = true; maybeShowInstallPrompt(); }, 8000);
     }
 
     init();

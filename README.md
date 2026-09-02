@@ -49,12 +49,25 @@ my-bookmarks-app/
 Double‑click **`index.html`**. It works on its own — add, edit, favourite,
 search, filter, delete, dark mode, all in `localStorage`.
 
-The **Bookmark Suggestions** section will say *“Extension not detected”* until you
-install the extension below.
+The **Bookmark Suggestions** section shows *“Extension not detected”*, and after a
+few seconds a one‑time prompt offers to set the extension up (**“Get suggested
+bookmarks as you browse”**). Follow it, or install manually below.
 
 ---
 
-## 2. Install the extension (Chrome)
+## 2. Install the extension
+
+The first time the dashboard loads without the extension, it shows a one‑time
+prompt. **Yes, enable suggestions** takes you to the setup; **Not now** hides it
+for 14 days. Once the extension connects even once, the prompt never returns, and
+the dashboard re‑detects it automatically when you come back to the tab.
+
+> A web page can't install a browser extension for you — that click has to happen
+> on the Chrome Web Store / Edge Add‑ons page, or as an unpacked developer
+> install. The extension isn't in a store yet, so use the steps below (this is
+> also where **Not now** / the panel's **Retry** button lead).
+
+### Chrome
 
 1. Go to `chrome://extensions`.
 2. Turn on **Developer mode** (top‑right).
@@ -69,7 +82,7 @@ install the extension below.
 6. Re‑open / refresh `index.html`. The suggestions section switches to
    *“No new suggestions”*. Browse a few sites and they start appearing.
 
-### Install the extension (Microsoft Edge)
+### Microsoft Edge
 
 Identical, at `edge://extensions`:
 
@@ -79,6 +92,13 @@ Identical, at `edge://extensions`:
 4. Refresh `index.html`.
 
 The same unpacked folder works in both browsers — no changes needed.
+
+### Dismissed the prompt?
+
+Open the collapsible **Automatic Suggestions** panel on the dashboard and use its
+**Retry** button, or just reload after installing. When `CHROME_STORE_URL` /
+`EDGE_STORE_URL` in `index.html` are filled in (after the extension is
+published), the prompt's **Yes** button opens the matching store page instead.
 
 ---
 
@@ -162,11 +182,12 @@ Then open `http://localhost:8777/index.html`. Add
 
 ## 7. Tests
 
-**No build tools required** — double‑click **`tests/run.html`**. It runs ~48
+**No build tools required** — double‑click **`tests/run.html`**. It runs ~60
 assertions covering URL normalization, the ignore rules, duplicate / dismissed /
 pending detection, the suggestion‑list reducers, bookmark‑index building,
-favicon hardening, and the extension↔dashboard message protocol
-(nonce, protocol, direction, action allow‑list, payload validation).
+favicon hardening, the extension↔dashboard message protocol (nonce, protocol,
+direction, action allow‑list, payload validation), and the first‑run install
+prompt logic (browser detection + the show/hide + 14‑day‑cooldown decision).
 The page title and `window.__TEST_RESULT__` report pass/fail counts.
 
 If you install Node 18+ later:

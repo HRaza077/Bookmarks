@@ -400,6 +400,54 @@
     return Object.assign({}, SETTINGS_DEFAULTS, sanitizeSettings(settings || {}));
   }
 
+  /* ---------- first-run install prompt (pure) ---------- */
+
+  var INSTALL_PROMPT_COOLDOWN_DAYS = 14;
+
+  /**
+   * Which browser is this, for picking a store listing.
+   * @param {string} userAgent - navigator.userAgent
+   * @param {object} [uaData]   - navigator.userAgentData (optional)
+   * @returns {"edge"|"chrome"|"other"}
+   */
+  function detectBrowser(userAgent, uaData) {
+    if (uaData && Array.isArray(uaData.brands)) {
+      var brands = uaData.brands.map(function (b) {
+        return (b && typeof b.brand === "string" ? b.brand : "").toLowerCase();
+      });
+      if (brands.indexOf("microsoft edge") !== -1) return "edge";
+      if (brands.indexOf("google chrome") !== -1) return "chrome";
+    }
+    var ua = typeof userAgent === "string" ? userAgent : "";
+    if (/\bEdg(?:e|A|iOS)?\//.test(ua)) return "edge";
+    if (/\b(?:Chrome|CriOS|Chromium)\//.test(ua) && !/\bOPR\//.test(ua)) return "chrome";
+    return "other";
+  }
+
+  /**
+   * Should the one-time "install the extension" modal show right now?
+   * A pure decision from connection state plus the last-dismissed timestamp.
+   * @param {object} ctx
+   *   ctx.connected       - the extension is talking to the page right now
+   *   ctx.everConnected   - it has connected at least once (this load or persisted)
+   *   ctx.settled         - the startup handshake retries have finished
+   *   ctx.lastDismissedAt - ms epoch of the last "Not now" (0 / undefined = never)
+   *   ctx.now             - ms epoch (defaults to Date.now())
+   *   ctx.cooldownDays    - days to stay quiet after a dismissal (default 14)
+   */
+  function shouldShowInstallPrompt(ctx) {
+    ctx = ctx || {};
+    if (ctx.connected) return false;
+    if (ctx.everConnected) return false;
+    if (!ctx.settled) return false;
+    var now = typeof ctx.now === "number" ? ctx.now : Date.now();
+    var cooldownDays = typeof ctx.cooldownDays === "number" && ctx.cooldownDays >= 0
+      ? ctx.cooldownDays : INSTALL_PROMPT_COOLDOWN_DAYS;
+    var last = typeof ctx.lastDismissedAt === "number" ? ctx.lastDismissedAt : 0;
+    if (last > 0 && now - last < cooldownDays * 864e5) return false;
+    return true;
+  }
+
   return {
     MAX_URL_LENGTH: MAX_URL_LENGTH,
     PROTOCOL: PROTOCOL,
@@ -419,6 +467,9 @@
     validatePageMessage: validatePageMessage,
     validateExtMessage: validateExtMessage,
     sanitizeSettings: sanitizeSettings,
-    withDefaults: withDefaults
+    withDefaults: withDefaults,
+    INSTALL_PROMPT_COOLDOWN_DAYS: INSTALL_PROMPT_COOLDOWN_DAYS,
+    detectBrowser: detectBrowser,
+    shouldShowInstallPrompt: shouldShowInstallPrompt
   };
 });
